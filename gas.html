@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ethereum Gas Fee Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #2d2d2d, #3b3b3b);
+      color: #fff;
+    }
+    .gas-fee-tracker {
+      text-align: center;
+      background: #333;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      max-width: 350px;
+      width: 100%;
+    }
+    h2 {
+      color: #ff9a00;
+    }
+    .fee {
+      font-size: 1.5em;
+      margin: 15px 0;
+    }
+    .label {
+      color: #aaa;
+      font-size: 0.9em;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #ff9a00;
+      border: none;
+      border-radius: 6px;
+      color: #333;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #e58900;
+    }
+    .error {
+      color: #ff4e4e;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="gas-fee-tracker">
+    <h2>Ethereum Gas Fee Tracker</h2>
+    <div id="gasInfo">
+      <div class="fee" id="lowFee">-</div>
+      <div class="label">Low Gas (Gwei)</div>
+
+      <div class="fee" id="averageFee">-</div>
+      <div class="label">Average Gas (Gwei)</div>
+
+      <div class="fee" id="highFee">-</div>
+      <div class="label">High Gas (Gwei)</div>
+    </div>
+    <button onclick="fetchGasFees()">Refresh Fees</button>
+    <div id="error" class="error"></div>
+  </div>
+
+  <script>
+    async function fetchGasFees() {
+      const apiKey = "H7VYRZEW6AN5BQYWWJ5MD2UNXR5SF3DVKF"; // Replace with your Etherscan API key
+      const errorDiv = document.getElementById("error");
+      errorDiv.textContent = "";  // Clear previous errors
+
+      try {
+        // Fetch gas fees data from Etherscan API
+        const response = await fetch(`https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${apiKey}`);
+        const data = await response.json();
+
+        if (data.status === "1") {
+          // Update the DOM with gas fees
+          document.getElementById("lowFee").textContent = data.result.SafeGasPrice + " Gwei";
+          document.getElementById("averageFee").textContent = data.result.ProposeGasPrice + " Gwei";
+          document.getElementById("highFee").textContent = data.result.FastGasPrice + " Gwei";
+        } else {
+          errorDiv.textContent = "Failed to fetch gas fees. Try again later.";
+        }
+      } catch (error) {
+        console.error("Error fetching gas fees:", error);
+        errorDiv.textContent = "An error occurred while fetching gas fees. Please try again.";
+      }
+    }
+
+    // Fetch gas fees on initial load
+    fetchGasFees();
+  </script>
+</body>
+</html>
